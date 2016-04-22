@@ -76,3 +76,7 @@ static/CACHE
 
 # swap files
 *.swp
+
+# more virtualenv stuff
+include/
+share/
