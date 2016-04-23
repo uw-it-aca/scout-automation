@@ -7,51 +7,17 @@ import sys
 import unittest
 import copy
 import os
-import pages
 
 from selenium import webdriver
-from django.test import LiveServerTestCase
 from django.test import Client
 from django.conf import settings
-from sauceclient import SauceClient
 
 from scout_auto.scout_testing import ScoutTest
-
-# False - runs locally, True - runs on SauceLabs
-useSauce = True
-
-USERNAME = getattr(settings, 'SAUCE_USERNAME', False)
-ACCESS_KEY = getattr(settings, 'SAUCE_ACCESS_KEY', False)
-
-sauce_client = SauceClient(USERNAME, ACCESS_KEY)
+from scout_auto import pages
 
 
 class FilterTest(ScoutTest):
     """Filter Tests set for scout"""
-
-    """
-    def setUp(self):
-        self.client = Client()
-        self.baseurl = 'http://localhost:8001'
-        self.desired_cap = {
-            'platform': 'Mac OS X 10.9',
-            'browserName': 'chrome',
-            'version': '31',
-            'tags': ['ui']
-        }
-        self.useSauce = useSauce
-
-        if useSauce:
-            sauceUrl = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' \
-                % (USERNAME, ACCESS_KEY)
-            self.driver = webdriver.Remote(
-                command_executor=sauceUrl,
-                desired_capabilities=self.desired_cap)
-        else:
-            self.driver = webdriver.Firefox()
-        # self.driver.implicitly_wait(20)
-
-"""
 
     def go_url(self, urlsuffix=''):
         """Has the driver go to the given URL"""
@@ -96,7 +62,7 @@ class FilterTest(ScoutTest):
             'OPEN PERIOD': {'open_now': True}
         })
         page.search()
-        self.assertEqual(page.filterBy.text, 'Payment Accepted, Food Served, Open Period')
+        self.assertEqual(page.filterBy.text, 'Payment Accepted, Food Served, Open Now')
         self.assertEqual(page.placesNum, 3)
 
     def test_filter_set5(self):
@@ -140,6 +106,7 @@ class FilterTest(ScoutTest):
             'CUISINE': {'s_cuisine_american': True}
         })
         page.reset()
+        page.get_filters()
         page.setFilters({'PAYMENT ACCEPTED': {'s_pay_cash': True}})
         page.search()
         self.assertEqual(page.placesNum, 4)

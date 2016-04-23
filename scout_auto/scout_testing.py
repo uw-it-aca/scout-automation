@@ -6,12 +6,11 @@ from selenium.webdriver import Firefox, Remote
 
 useSauce = getattr(settings, 'SAUCE_ENABLED', False)
 
-USERNAME = getattr(settings, 'SAUCE_USERNAME', False)
-ACCESS_KEY = getattr(settings, 'SAUCE_ACCESS_KEY', False)
+USERNAME = getattr(settings, 'SAUCE_USERNAME', None)
+ACCESS_KEY = getattr(settings, 'SAUCE_ACCESS_KEY', None)
 
 if useSauce:
     sauce_client = SauceClient(USERNAME, ACCESS_KEY)
-
 
 class ScoutTest(LiveServerTestCase):
 
@@ -23,6 +22,12 @@ class ScoutTest(LiveServerTestCase):
 
         self.driver = self.get_driver()
 
+    def get_driver(self):
+        if useSauce:
+            return self.get_sauce_driver()
+        else:
+            return Firefox()
+
     def get_sauce_driver(self):
         desired_cap = {
             'platform': 'Mac OS X 10.9',
@@ -32,19 +37,12 @@ class ScoutTest(LiveServerTestCase):
         }
         sauceUrl = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' \
             % (USERNAME, ACCESS_KEY)
-        
+
         driver = Remote(
             command_executor=sauceUrl,
             desired_capabilities=desired_cap)
 
         return driver
-
-    def get_driver(self):
-
-        if useSauce:
-            return self.get_sauce_driver()
-        else:
-            return Firefox()
 
     def updateSauceName(self, name):
         """Sets the saucelabs job name"""

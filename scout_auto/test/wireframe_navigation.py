@@ -7,51 +7,17 @@ mock data and tests the navigation incorporating that data
 import os
 import sys
 import os.path
-import pages
+from scout_auto import pages
 
 from selenium import webdriver
 from django.test import LiveServerTestCase
 from django.conf import settings
+from scout_auto.scout_testing import ScoutTest
 
-USERNAME = getattr(settings, 'SAUCE_USERNAME', False)
-ACCESS_KEY = getattr(settings, 'SAUCE_ACCESS_KEY', False)
-
-from sauceclient import SauceClient
-sauce_client = SauceClient(USERNAME, ACCESS_KEY)
-
-class AdvNavigationTest(LiveServerTestCase):
-
-    baseurl = 'http://localhost:8001'
-
-    def setUp(self):
-
-        self.desired_cap = {
-            'platform': "Mac OS X 10.9",
-            'browserName': "chrome",
-            'version': "31",
-            'tags': ["wireframe"]
-        }
-
-        self.driver = webdriver.Remote(
-            command_executor='http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (USERNAME, ACCESS_KEY),
-            desired_capabilities=self.desired_cap)
-
-        self.driver.implicitly_wait(20)
+class AdvNavigationTest(ScoutTest):
 
     def go_url(self, urlsuffix = ''):
         self.driver.get(self.baseurl + urlsuffix)
-
-    def updateSauceName(self, name):
-        sauce_client.jobs.update_job(self.driver.session_id, name=name)
-
-    def tearDown(self):
-        try:
-            if sys.exc_info() == (None, None, None):
-                sauce_client.jobs.update_job(self.driver.session_id, passed=True)
-            else:
-                sauce_client.jobs.update_job(self.driver.session_id, passed=False)
-        finally:
-            self.driver.quit()
 
     def test_breakfast(self):
         """SCOUT-70, testing to see if user can bring up list of b-fast
@@ -86,7 +52,7 @@ class AdvNavigationTest(LiveServerTestCase):
         page = pages.HomePage(self.driver)
         page.click_results('open')
         self.assertEqual('page_food', page.pageId)
-        self.assertEqual(page.filterBy.text, "Open Period")
+        self.assertEqual(page.filterBy.text, "Open Now")
         self.assertEqual(page.placesCount.text, "8")
 
     def test_late(self):

@@ -22,8 +22,8 @@ class BasePage(object):
 
     @property
     def pageId(self):
-        temp =  self.driver.find_element_by_class_name('scout-content')
-        return temp.get_attribute('id')
+        content = self.driver.find_element_by_class_name('scout-content')
+        return content.get_attribute('id')
 
     @property
     def footer(self):
@@ -202,6 +202,13 @@ class PlacesPage(BasePage):
         placeName = place.find_element_by_class_name('scout-spot-name')
         return placeName
 
+    def placesUrl(self, num=0):
+        """Returns the URL of the given numbered
+        place on the places list"""
+        place = self.placesList[num]
+        link = place.find_element_by_tag_name('a')
+        return link.get_attribute('href')
+
     def reset_filters(self):
         """Clicks the reset filter link"""
         self.filterReset.click()
@@ -277,6 +284,7 @@ class FilterPage(BasePage):
     def reset(self):
         """Clicks the reset button"""
         self.resetButton.click()
+        self._become_places()
 
 class FilterBox(object):
     def __init__(self, element):
