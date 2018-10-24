@@ -1,0 +1,6 @@
+Django<=1.8.6
+django-compressor
+-e git://github.com/uw-it-aca/scout.git@story/food#egg=scout
+selenium
+-e git+https://github.com/uw-it-aca/spotseeker_client.git@qaMock#egg=spotseeker-restclient
+sauceclient
